@@ -1,11 +1,8 @@
 package org.chaseoaks.xair_proxy;
 
-import static org.testng.Assert.*;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +10,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacketEvent;
@@ -48,7 +46,7 @@ public class LoopBackTest {
 		sleep(100);
 		OSCMessage lastMessage = listener.getLastMessage();
 
-		org.testng.Assert.assertNotNull(lastMessage, "lastMessage is NULL (xinfo)");
+		assertNotNull(lastMessage, "lastMessage is NULL (xinfo)");
 		String address = lastMessage.getAddress();
 		assertEquals(address, "/xinfo");
 
@@ -58,7 +56,7 @@ public class LoopBackTest {
 		listener.clearLast();
 
 		lastMessage = listener.getLastMessage();
-		org.testng.Assert.assertNull(lastMessage, "lastMessage not cleared");
+		assertNull(lastMessage, "lastMessage not cleared");
 
 		message = new OSCMessage("/ch/01/mix/fader", origArguments);
 		portOut.send(message);
@@ -74,17 +72,18 @@ public class LoopBackTest {
 		assertEquals(recvArguments.size(), 1);
 		Class<? extends Object> argClass = recvArguments.get(0).getClass();
 		assertEquals(argClass.getName(), "java.lang.Float");
-		assertEquals(recvArguments.get(0), 0.75f);
+		assertEquals((float) recvArguments.get(0), 0.75f, 0.0001f);
 
 		portIn.stopListening();
 		portOut.close();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void loopBack2() throws IOException, OSCSerializeException {
-		
-		Map<String,Object> exMap = new TreeMap<String,Object>();
-		
+
+		Map<String, Object> exMap = new TreeMap<String, Object>();
+
 		exMap.put("port", 60001);
 		OSCProxyPacketListener listener = new OSCProxyPacketListener();
 		listener.setMap(exMap);
@@ -115,7 +114,7 @@ public class LoopBackTest {
 		OSCMessage lastMessage = listener.getLastMessage();
 		lastMessage.getInfo();
 
-		org.testng.Assert.assertNotNull(lastMessage, "lastMessage is NULL (xinfo)");
+		assertNotNull(lastMessage, "lastMessage is NULL (xinfo)");
 
 		String address = lastMessage.getAddress();
 		assertEquals(address, "/xinfo");
@@ -124,12 +123,13 @@ public class LoopBackTest {
 		portOut.close();
 
 		OSCPacketEvent lastEvent = listener.getLastEvent();
+		@SuppressWarnings("unused")
 		Object eSource = lastEvent.getSource();
 		int inport = 0;
 		if (lastEvent instanceof Map) {
 			inport = (int) ((Map) lastEvent).get("port");
 		}
-		assertEquals(inport,60001);
+		assertEquals(inport, 60001);
 
 	}
 
@@ -141,5 +141,4 @@ public class LoopBackTest {
 			// e.printStackTrace();
 		}
 	}
-
 }

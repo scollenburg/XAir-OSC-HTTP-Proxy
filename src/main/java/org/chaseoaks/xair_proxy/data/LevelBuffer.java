@@ -10,9 +10,9 @@ import org.greynite.commons.collections.CircularLIFOArrayList;
 import com.illposed.osc.OSCMessage;
 
 /**
- * Buffer to store meter level results from the XAir. A custom Jackson JSON
- * serializer ( {@link LevelBufferSerializer} ) is used to return the results,
- * most recent first.
+ * Buffer to store meter level results from the XAir. A
+ * {@link CircularLIFOArrayList circular LIFO ArrayList} is used to
+ * keep the most recent level results and return them in LIFO order.
  * <p>
  * The internal buffer has a fixed size, and will loop discarding the oldest
  * results if results are not polled often enough.

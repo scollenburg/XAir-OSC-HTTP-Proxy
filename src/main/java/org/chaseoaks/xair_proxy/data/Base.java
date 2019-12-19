@@ -3,6 +3,7 @@ package org.chaseoaks.xair_proxy.data;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.illposed.osc.OSCMessage;
 
 public abstract class Base {
 
@@ -30,6 +31,8 @@ public abstract class Base {
 		SimpleModule module = new SimpleModule();
 		module.addSerializer(ByteBundle.class, new ByteArraySerializer<ByteBundle>());
 		// module.addSerializer(LevelBuffer.class, new LevelBufferSerializer());
+		module.addSerializer(OSCMessage.class, new OSCMessageSerializer<OSCMessage>(OSCMessage.class));
+		module.addDeserializer(OSCMessage.class, new OSCMessageDeserializr<OSCMessage>(OSCMessage.class));
 		mapper.registerModule(module);
 		return mapper;
 	}

@@ -1,15 +1,12 @@
 package org.chaseoaks.xair_proxy.data;
 
 import java.time.Instant;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.illposed.osc.OSCMessage;
 
 /**
- * Buffer to store meter level results from the XAir. A custom Jackson JSON
- * serializer ( {@link LevelBufferSerializer} ) is used to return the results,
- * most recent first.
+ * Buffer to store meter level results from the XAir.
  * <p>
  * The internal buffer has a fixed size, and will loop discarding the oldest
  * results if results are not polled often enough.
@@ -25,15 +22,21 @@ import com.illposed.osc.OSCMessage;
  */
 public class ResponseBuffer extends Base {
 
+	@JsonIgnore
 	protected OSCMessage message = null;
 	public String command = null;
+	@JsonIgnore
 	public long timeStampMillis = 0;
 
 	public ResponseBuffer(OSCMessage message) {
 		this.message = message;
-		this.command = message.toString();
+		this.command = message.getAddress();
 		Instant instant = Instant.now();
 		timeStampMillis = instant.toEpochMilli();
+	}
+
+	public OSCMessage getMessage() {
+		return this.message;
 	}
 
 }

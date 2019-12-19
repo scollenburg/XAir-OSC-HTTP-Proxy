@@ -1,20 +1,18 @@
 package org.chaseoaks.xair_proxy.data;
 
-import org.testng.annotations.*;
-import static org.testng.Assert.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import org.testng.Assert;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 public class BaseTest {
 
 	@Test
 	public void basic() {
-		
+
 	}
-	
+
 	class BaseFrame extends org.chaseoaks.xair_proxy.data.Base {
 		public String hello = "Hello!";
 		public int two = 2;
@@ -29,13 +27,14 @@ public class BaseTest {
 		}
 	}
 
-	// @ T e s t
+	@Test
 	public void testToJson() {
 
 		BaseFrame frame = new BaseFrame();
-
 		String result = frame.toJson();
-		assertEquals(result, "{\"hello\":\"Hello!\",\"two\":2,\"threeQuarter\":0.75,\"recent\":{\"/$bundle\":[1,2,3,255]}}");
+		// assertEquals(actual, expected);
+		assertEquals(result,
+				"{\"hello\":\"Hello!\",\"two\":2,\"threeQuarter\":0.75,\"recent\":{\"/$bundle\":[1,2,3,255]}}");
 	}
 
 }

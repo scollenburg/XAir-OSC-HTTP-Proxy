@@ -15,6 +15,8 @@ plugins {
     id 'application'
 }
 
+project.buildDir = '/bin'
+
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
@@ -30,6 +32,8 @@ dependencies {
 
     // Use TestNG framework, also requires calling test.useTestNG() below
     testImplementation 'org.testng:testng:6.14.3'
+    // REST Assured for Web testing: https://github.com/rest-assured/rest-assured/wiki/Usage
+    testImplementation 'io.rest-assured:rest-assured:4.1.2'
 }
 
 application {

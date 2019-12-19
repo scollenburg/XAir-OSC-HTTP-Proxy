@@ -32,8 +32,8 @@ public class LevelBufferSerializer<T> extends JsonSerializer<T> {
 
 		jgen.writeFieldName("buffer");
 		// jgen.writeStartArray();
-		ByteBundle[] buffer = levelBuffer.getRecent();
-		jgen.writeObject(buffer);
+		// ByteBundle[] buffer = levelBuffer.getRecent();
+		// jgen.writeObject(buffer);
 		// jgen.writeEndArray();
 
 		jgen.writeEndObject();

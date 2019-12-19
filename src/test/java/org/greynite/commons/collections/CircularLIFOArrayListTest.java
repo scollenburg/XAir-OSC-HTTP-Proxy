@@ -1,10 +1,10 @@
 package org.greynite.commons.collections;
 
-import static org.testng.Assert.*;
-
 import org.chaseoaks.xair_proxy.data.Base;
 import org.chaseoaks.xair_proxy.data.ByteBundle;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,8 +14,8 @@ public class CircularLIFOArrayListTest {
 	/**
 	 * Warm things up so per-test timings are more accurate
 	 */
-	@org.testng.annotations.BeforeClass
-	public void preloads() {
+	@BeforeClass
+	public static void preloads() {
 		CircularLIFOArrayList<Integer> lifo = new CircularLIFOArrayList<Integer>(20);
 
 		assertEquals(lifo.size(), 0);
