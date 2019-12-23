@@ -1,0 +1,22 @@
+package org.chaseoaks.xair_proxy.servlet;
+
+import java.util.Map;
+
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpSession;
+
+public interface ServletRequestResponse extends Map<String, Object> {
+
+	public javax.servlet.http.HttpServletRequest getRequest();
+
+	public String getContextPath();
+
+	public HttpSession getSession();
+
+	public void setResponse(ServletResponse response);
+
+	public ServletResponse getResponse();
+
+	@SuppressWarnings("rawtypes")
+	public Object safeGet(Class clzz, String key);
+}

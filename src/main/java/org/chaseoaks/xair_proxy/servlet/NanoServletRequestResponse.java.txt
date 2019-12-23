@@ -1,0 +1,157 @@
+package org.chaseoaks.xair_proxy.servlet;
+
+import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponseWrapper;
+import javax.servlet.http.HttpSession;
+
+import fi.iki.elonen.NanoHTTPD;
+import fi.iki.elonen.NanoHTTPD.IHTTPSession;
+
+public class NanoServletRequestResponse implements ServletRequestResponse {
+
+	protected Map<String, Object> exMap = new TreeMap<String, Object>();
+	protected NanoHTTPD server;
+	protected IHTTPSession nanoSession;
+	// protected NanoServletResponseWrapper nanoRespWrapper;
+	protected NanoServletRequestWrapper reqWrapper;
+	protected HttpServletResponseWrapper respWrapper;
+
+	public NanoServletRequestResponse(NanoHTTPD server, IHTTPSession session) {
+		this.server = server;
+		this.nanoSession = session;
+		this.buildRequestWrapper();
+		this.buildResponseWrapper();
+	}
+
+	protected void buildRequestWrapper() {
+		// TODO Auto-generated method stub
+		this.reqWrapper = new NanoServletRequestWrapper(this.server, this.nanoSession);
+	}
+
+	protected void buildResponseWrapper() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean containsKey(Object arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean containsValue(Object arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Set<Entry<String, Object>> entrySet() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object get(Object arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Set<String> keySet() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object put(String arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void putAll(Map<? extends String, ? extends Object> arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Object remove(Object arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int size() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Collection<Object> values() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HttpServletRequest getRequest() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getContextPath() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HttpSession getSession() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setResponse(ServletResponse response) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public ServletResponse getResponse() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public fi.iki.elonen.NanoHTTPD.Response getNanoReponse() {
+		return newFixedLengthResponse(this.respWrapper.toString());
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Object safeGet(Class clzz, String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

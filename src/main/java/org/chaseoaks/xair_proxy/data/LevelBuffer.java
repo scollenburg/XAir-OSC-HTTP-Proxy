@@ -1,9 +1,7 @@
 package org.chaseoaks.xair_proxy.data;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import org.greynite.commons.collections.CircularLIFOArrayList;
 

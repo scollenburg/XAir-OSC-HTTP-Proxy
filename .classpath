@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry output="bin/main" kind="src" path="src/main/java">
 		<attributes>
 			<attribute name="gradle_scope" value="main"/>
@@ -27,7 +26,13 @@
 			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
+	<classpathentry sourcepath="C:/Users/scollenburg/.gradle/caches/modules-2/files-2.1/javax.servlet/javax.servlet-api/3.1.0/ab3976d4574c48d22dc1abf6a9e8bd0fdf928223/javax.servlet-api-3.1.0-sources.jar" kind="lib" path="C:/Users/scollenburg/.gradle/caches/modules-2/files-2.1/javax.servlet/javax.servlet-api/3.1.0/3cd63d075497751784b2fa84be59432f4905bf7c/javax.servlet-api-3.1.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry sourcepath="C:/Users/scollenburg/.gradle/caches/modules-2/files-2.1/com.illposed.osc/javaosc-core/0.6/d1ba5cb2db4bbce10b17f8d43afeeb586fe9d78c/javaosc-core-0.6-sources.jar" kind="lib" path="C:/Users/scollenburg/.gradle/caches/modules-2/files-2.1/com.illposed.osc/javaosc-core/0.6/d95f7a93bd54c11bd0b5d094bc1974d065ade4c3/javaosc-core-0.6.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>

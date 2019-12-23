@@ -1,5 +1,8 @@
 package org.chaseoaks.xair_proxy;
 
+import org.chaseoaks.xair_proxy.data.MixerInfo;
+import org.chaseoaks.xair_proxy.data.MixerRegistry;
+import org.chaseoaks.xair_proxy.data.OSCPortMap;
 import org.chaseoaks.xair_proxy.xair.MetersBuffer;
 
 /**
@@ -17,7 +20,9 @@ import org.chaseoaks.xair_proxy.xair.MetersBuffer;
 public class FactoryMaster {
 
 	protected static FactoryMaster master;
-	protected MetersBuffer metersBuffer;
+	protected static MetersBuffer metersBuffer;
+	protected static MixerRegistry mixers;
+	protected static OSCPortMap portMap;
 
 	/**
 	 * Allow override of default master factory. Yes, there are other cooler, more
@@ -29,22 +34,33 @@ public class FactoryMaster {
 		FactoryMaster.master = master;
 	}
 
-	/**
-	 * Generate default master factory
-	 */
-	public static void setMaster() {
+	public static FactoryMaster getMaster() {
 		if (FactoryMaster.master == null)
 			FactoryMaster.master = new FactoryMaster();
-	}
-
-	public static FactoryMaster getMaster() {
 		return FactoryMaster.master;
 	}
 
 	public MetersBuffer getMetersBuffer() {
-		if (this.metersBuffer == null)
-			this.metersBuffer = new MetersBuffer();
+		if (FactoryMaster.metersBuffer == null)
+			FactoryMaster.metersBuffer = new MetersBuffer();
 
-		return this.metersBuffer;
+		return FactoryMaster.metersBuffer;
 	}
+
+	public MixerRegistry getMixerRegistry() {
+		if (FactoryMaster.mixers == null) {
+			FactoryMaster.mixers = new MixerRegistry();
+			FactoryMaster.mixers.add(MixerRegistry.buildLoopback());
+		}
+
+		return FactoryMaster.mixers;
+	}
+
+	public OSCPortMap getPortMap() {
+		if (FactoryMaster.portMap == null)
+			FactoryMaster.portMap = new OSCPortMap();
+
+		return FactoryMaster.portMap;
+	}
+
 }

@@ -234,12 +234,13 @@ public class CircularLIFOArrayList<T> extends AbstractList<T> implements RandomA
 		return Arrays.copyOf(elementData, this.size());
 	}
 
+	@SuppressWarnings("hiding")
 	@Override
 	public <T> T[] toArray(T[] a) {
 		T[] elementData = arrayList.toArray(a);
 		// Object[] elementData = arrayList.toArray();
 		// return Arrays.copyOf(elementData, this.size() );
-		return a;
+		return elementData;
 	}
 
 }

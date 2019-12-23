@@ -7,6 +7,8 @@ import com.illposed.osc.OSCMessage;
 
 public abstract class Base {
 
+	private static final String EMPTY_STRING = "";
+
 	public String toJson() {
 		ObjectMapper mapper = Base.getMapper();
 		String jsonString = null;
@@ -36,4 +38,12 @@ public abstract class Base {
 		mapper.registerModule(module);
 		return mapper;
 	}
+
+	public static String safeString(String in) {
+		if (in == null)
+			return EMPTY_STRING;
+
+		return in;
+	}
+
 }
