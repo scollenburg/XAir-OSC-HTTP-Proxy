@@ -33,6 +33,11 @@ public class MixerRegistry extends Base {
 		mi.mixerId = 127;
 		mi.mixerAddress = "127.0.0.1";
 		mi.mixerPort = 12701;
+		mi.active = true;
 		return mi;
+	}
+	
+	public static void startLoopback() {
+		
 	}
 }

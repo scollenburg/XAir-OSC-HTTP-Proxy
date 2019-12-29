@@ -11,4 +11,5 @@ public class MixerInfo {
 	public String mixerAddress;
 	public int mixerPort;
 	public Map<String, OSCRequest> requestMap;
+	public boolean active;
 }

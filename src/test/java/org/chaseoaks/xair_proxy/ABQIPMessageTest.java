@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 
 import com.illposed.osc.OSCMessage;
 
-public class ABQIPMessage {
+public class ABQIPMessageTest {
 
 	Random random = new Random();
 

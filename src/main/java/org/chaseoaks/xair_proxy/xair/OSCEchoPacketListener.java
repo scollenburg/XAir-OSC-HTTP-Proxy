@@ -1,6 +1,9 @@
-package org.chaseoaks.xair_proxy;
+package org.chaseoaks.xair_proxy.xair;
 
 import java.util.Map;
+
+import org.chaseoaks.xair_proxy.data.IPMessage;
+import org.chaseoaks.xair_proxy.data.RequestAssoc;
 
 import com.illposed.osc.OSCBadDataEvent;
 import com.illposed.osc.OSCBundle;
@@ -11,10 +14,18 @@ import com.illposed.osc.OSCPacketEvent;
 import com.illposed.osc.OSCPacketListener;
 import com.illposed.osc.argument.OSCTimeTag64;
 
-public class OSCProxyPacketListener implements OSCPacketListener {
+public class OSCEchoPacketListener implements OSCPacketListener {
 
+	protected RequestAssoc ra;
 	protected OSCPacketEventEx lastEvent;
 	protected Map<String, Object> exMap;
+
+	public OSCEchoPacketListener(RequestAssoc rassoc) {
+		this.ra = rassoc;
+	}
+
+	public OSCEchoPacketListener() {
+	}
 
 	@Override
 	public void handlePacket(OSCPacketEvent originalEvent) {
@@ -25,21 +36,15 @@ public class OSCProxyPacketListener implements OSCPacketListener {
 
 		OSCPacket packet = lastEvent.getPacket();
 
-		if (packet instanceof OSCBundle) {
-			handleBundle(lastEvent.getSource(), (OSCBundle) packet);
-		} else {
-			OSCTimeTag64 timeStamp = OSCTimeTag64.IMMEDIATE;
-			handleMessage(new OSCMessageEvent(lastEvent.getSource(), timeStamp, (OSCMessage) packet));
-		}
-	}
-
-	protected void handleMessage(OSCMessageEvent oscMessageEvent) {
-		// TODO
-		OSCMessage message = oscMessageEvent.getMessage();
-	}
-
-	protected void handleBundle(Object source, OSCBundle packet) {
-
+		// if (packet instanceof OSCBundle) {
+		// handleBundle(lastEvent.getSource(), (OSCBundle) packet);
+		// } else {
+		// OSCTimeTag64 timeStamp = OSCTimeTag64.IMMEDIATE;
+		// handleMessage(new OSCMessageEvent(lastEvent.getSource(), timeStamp,
+		// (OSCMessage) packet));
+		// }
+		
+		
 	}
 
 	@Override

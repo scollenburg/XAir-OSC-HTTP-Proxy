@@ -1,16 +1,15 @@
 package org.chaseoaks.xair_proxy.servlet;
 
-import org.chaseoaks.xair_proxy.OSCProxyServer;
-import org.chaseoaks.xair_proxy.data.MixerInfo;
-import org.chaseoaks.xair_proxy.servlet.OSCHandler;
-
-import org.testng.annotations.Test;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+
+import org.chaseoaks.xair_proxy.data.MixerInfo;
+import org.chaseoaks.xair_proxy.data.RequestAssoc;
+import org.testng.annotations.Test;
 
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacket;
@@ -31,10 +30,11 @@ public class OSCHandlerTest {
 		}
 
 		protected OSCPortOut buildOSCPortOut(MixerInfo mixerInfo) throws UnknownHostException, IOException {
-			lastPortOut = super.buildOSCPortOut(mixerInfo);
+
+			RequestAssoc ra = new RequestAssoc(null, null);
+			lastPortOut = super.buildOSCPortOut(ra, mixerInfo);
 			return lastPortOut;
 		}
-
 	}
 
 	class NanoReqRespMock extends NanoReqResp {
@@ -60,7 +60,7 @@ public class OSCHandlerTest {
 		}
 	}
 
-	@Test
+	@Test(timeOut = 1000)
 	public void basicPathMarshalling() {
 		NanoReqRespMock rr = new NanoReqRespMock(null, null, "");
 

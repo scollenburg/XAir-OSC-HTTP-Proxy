@@ -1,4 +1,4 @@
-package org.chaseoaks.xair_proxy;
+package org.chaseoaks.xair_proxy.xair;
 
 import java.util.Collection;
 import java.util.Map;

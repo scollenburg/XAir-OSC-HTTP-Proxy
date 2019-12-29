@@ -1,13 +1,16 @@
 package org.chaseoaks.xair_proxy.servlet;
 
-import org.chaseoaks.xair_proxy.OSCProxyServer;
+import java.io.Closeable;
+import java.io.IOException;
+
+import org.chaseoaks.xair_proxy.data.RequestAssoc;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
 
-public class NanoReqResp implements Cloneable {
+public class NanoReqResp implements Cloneable, Closeable {
 
 	protected final static String EMPTY_STRING = "";
 
@@ -17,6 +20,8 @@ public class NanoReqResp implements Cloneable {
 	protected Response nanoResponse;
 	protected String responseString;
 	protected Status responseStatus;
+
+	protected RequestAssoc requestAssoc;
 
 	public NanoReqResp(OSCProxyServer server, IHTTPSession session, String contextPath) {
 		this.server = server;
@@ -108,6 +113,15 @@ public class NanoReqResp implements Cloneable {
 		if (this.session.getQueryParameterString() == null)
 			return EMPTY_STRING;
 		return this.session.getQueryParameterString();
+	}
+
+	@Override
+	public void close() throws IOException {
+		// noop
+	}
+
+	public void setRequestAssoc(RequestAssoc ra) {
+		this.requestAssoc = ra;
 	}
 
 }

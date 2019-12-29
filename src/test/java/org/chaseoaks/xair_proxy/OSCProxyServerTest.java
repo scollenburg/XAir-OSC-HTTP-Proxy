@@ -7,6 +7,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import org.chaseoaks.xair_proxy.data.Base;
+import org.chaseoaks.xair_proxy.servlet.OSCProxyServer;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -39,7 +40,7 @@ import io.restassured.response.Response;
 
 public class OSCProxyServerTest {
 
-	org.chaseoaks.xair_proxy.OSCProxyServer server = new OSCProxyServer("localhost", 8123);
+	org.chaseoaks.xair_proxy.servlet.OSCProxyServer server = new OSCProxyServer("localhost", 8123);
 
 	@BeforeClass
 	public void startTheServer() throws IOException {

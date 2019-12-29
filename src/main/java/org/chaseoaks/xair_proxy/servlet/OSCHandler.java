@@ -2,23 +2,29 @@ package org.chaseoaks.xair_proxy.servlet;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.chaseoaks.xair_proxy.FactoryMaster;
-import org.chaseoaks.xair_proxy.OSCProxyPacketListener;
+import org.chaseoaks.xair_proxy.data.Base;
 import org.chaseoaks.xair_proxy.data.IPMessage;
 import org.chaseoaks.xair_proxy.data.MixerInfo;
 import org.chaseoaks.xair_proxy.data.MixerRegistry;
 import org.chaseoaks.xair_proxy.data.OSCPortMap;
 import org.chaseoaks.xair_proxy.data.RequestAssoc;
+import org.chaseoaks.xair_proxy.xair.OSCProxyPacketListener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacket;
+import com.illposed.osc.OSCSerializerFactory;
 import com.illposed.osc.transport.udp.OSCPortIn;
 import com.illposed.osc.transport.udp.OSCPortOut;
 
@@ -67,6 +73,7 @@ public class OSCHandler implements IGenericServlet {
 
 		if (packet != null) {
 			dispatchOSC(segments.group(2), packet, reqResp);
+			waitForReponse(reqResp);
 		}
 
 		return;
@@ -131,17 +138,14 @@ public class OSCHandler implements IGenericServlet {
 
 		try {
 			RequestAssoc ra = new RequestAssoc(reqResp, packet);
+			reqResp.setRequestAssoc(ra);
 			ra.set(buildABQueue()); // ArrayBlockingQueue<IPMessage> abQueue =
 
-			OSCPortMap portMap = FactoryMaster.getMaster().getPortMap();
-			int inIPPort = portMap.getNextPort();
-
-			OSCPortIn portIn = ra.set(buildOSCPortIn(inIPPort));
-
 			OSCProxyPacketListener listener = ra.set(buildListener(ra));
+			OSCPortIn portIn = buildOSCPortIn(ra);
 			portIn.addPacketListener(listener);
 
-			OSCPortOut portOut = ra.set(buildOSCPortOut(mixerInfo));
+			OSCPortOut portOut = ra.set(buildOSCPortOut(ra, mixerInfo));
 			if (portOut == null) {
 				if (portIn != null)
 					portIn.close();
@@ -150,6 +154,7 @@ public class OSCHandler implements IGenericServlet {
 				return;
 			}
 
+			OSCPortMap portMap = FactoryMaster.getMaster().getPortMap();
 			portMap.registerPort(ra);
 
 			portIn.startListening();
@@ -166,8 +171,8 @@ public class OSCHandler implements IGenericServlet {
 	}
 
 	protected OSCProxyPacketListener buildListener(RequestAssoc ra) {
-		// TODO Auto-generated method stub
-		return null;
+		OSCProxyPacketListener listener = new OSCProxyPacketListener(ra);
+		return listener;
 	}
 
 	protected ArrayBlockingQueue<IPMessage> buildABQueue() {
@@ -175,12 +180,70 @@ public class OSCHandler implements IGenericServlet {
 		return queue;
 	}
 
-	protected OSCPortIn buildOSCPortIn(int inIPPort) throws IOException {
-		return new OSCPortIn(inIPPort);
+	protected OSCPortIn buildOSCPortIn(RequestAssoc ra) throws IOException {
+		OSCPortMap portMap = FactoryMaster.getMaster().getPortMap();
+		int inIPPort;
+
+		OSCPortIn port = null;
+		for (int i = 0; i < 5; i++) {
+			inIPPort = portMap.getNextPort();
+			port = new OSCPortIn(inIPPort);
+			port.setDaemonListener(false);
+			port.setResilient(true);
+			port.startListening();
+			if (port.isListening()) {
+				ra.portIn = port;
+				ra.inIPPort = inIPPort;
+				break;
+			}
+			port.isConnected();
+			port = null;
+		}
+
+		return port;
 	}
 
-	protected OSCPortOut buildOSCPortOut(MixerInfo mixerInfo) throws UnknownHostException, IOException {
-		return new OSCPortOut(InetAddress.getByName(mixerInfo.mixerAddress), mixerInfo.mixerPort);
+	protected OSCPortOut buildOSCPortOut(RequestAssoc ra, MixerInfo mixerInfo)
+			throws UnknownHostException, IOException {
+		// return new OSCPortOut(InetAddress.getByName(mixerInfo.mixerAddress),
+		// mixerInfo.mixerPort);
+		// OSCPortOut portOut =
+		return new OSCPortOut(OSCSerializerFactory.createDefaultFactory(),
+				new InetSocketAddress(mixerInfo.mixerAddress, mixerInfo.mixerPort), new InetSocketAddress(ra.inIPPort));
+
+	}
+
+	protected void waitForReponse(NanoReqResp reqResp) {
+
+		IPMessage message = null;
+		boolean done = false;
+		int guard = 4;
+
+		while (!done) {
+			try {
+				message = reqResp.requestAssoc.abQueue.poll(25, TimeUnit.MILLISECONDS);
+				if (message == null)
+					continue;
+				if (message.rc >= 0)
+					done = true;
+				if (message.data != null) {
+					if (message.data instanceof OSCMessage) {
+						ObjectMapper om = Base.getMapper();
+						reqResp.setResponse(om.writeValueAsString(message.data));
+						reqResp.setStatus(Status.OK);
+					}
+				}
+
+			} catch (InterruptedException | JsonProcessingException e) {
+				// TODO LOGGING Auto-generated catch block
+				// e.printStackTrace();
+			}
+			if (message == null) {
+				if (guard-- <= 0)
+					break;
+				continue;
+			}
+		} // while
 	}
 
 }

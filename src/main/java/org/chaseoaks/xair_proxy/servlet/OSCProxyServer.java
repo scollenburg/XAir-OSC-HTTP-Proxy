@@ -1,11 +1,8 @@
-package org.chaseoaks.xair_proxy;
+package org.chaseoaks.xair_proxy.servlet;
 
 import java.util.Map;
 
 import org.chaseoaks.xair_proxy.data.ProxyStats;
-import org.chaseoaks.xair_proxy.servlet.HandlerInfo;
-import org.chaseoaks.xair_proxy.servlet.NanoReqResp;
-import org.chaseoaks.xair_proxy.servlet.ServletFactory;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
