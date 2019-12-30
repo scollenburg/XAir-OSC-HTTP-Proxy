@@ -106,10 +106,12 @@ public class OSCProxyServerTest {
 	public void simpleMeters() throws IOException {
 
 		Response response;
+
+		get("http://localhost:8123/meters/ipsum/should/not/be/found").then().statusCode(400);
+		
 		response = get("http://localhost:8123/xap/loopback/meters?status");
 		assertTrue(response.asString().contains("meters"), "Bad '/meters?status' response: " + response.asString() + " ::");
 
-		get("http://localhost:8123/meters/ipsum/should/not/be/found").then().statusCode(400);
 
 	}
 

@@ -5,6 +5,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.chaseoaks.xair_proxy.data.IPMessage;
 import org.chaseoaks.xair_proxy.servlet.OSCHandler;
 
+import com.illposed.osc.OSCPacketEvent;
 import com.illposed.osc.transport.udp.OSCPortIn;
 
 public class CloseWrappers {
@@ -29,13 +30,14 @@ public class CloseWrappers {
 		}).start();
 	}
 
-	public static void closeABQueue(ArrayBlockingQueue<IPMessage> abq) {
-		abq.offer(OSCHandler.COOLDOWN_IPMESSAGE);
+	@SuppressWarnings({ "unchecked" })
+	public static void closeABQueue(ArrayBlockingQueue<IPMessage<OSCPacketEvent>> o) {
+		o.offer(OSCHandler.COOLDOWN_IPMESSAGE);
 
 		new Thread(() -> {
 			safeSleep(100);
 			try {
-				abq.clear();
+				o.clear();
 			} catch (Exception e) {
 			}
 		}).start();

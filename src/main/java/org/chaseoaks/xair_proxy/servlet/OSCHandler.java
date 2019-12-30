@@ -1,7 +1,6 @@
 package org.chaseoaks.xair_proxy.servlet;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacket;
+import com.illposed.osc.OSCPacketEvent;
 import com.illposed.osc.OSCSerializerFactory;
 import com.illposed.osc.transport.udp.OSCPortIn;
 import com.illposed.osc.transport.udp.OSCPortOut;
@@ -37,6 +37,7 @@ public class OSCHandler implements IGenericServlet {
 	public static final Pattern FIRST_SEGMENT = Pattern.compile("([/](\\w*))([/].*)");
 
 	public static final String COOLDOWN = "CoolDown";
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static final IPMessage COOLDOWN_IPMESSAGE = new IPMessage("COOLDOWN", null, -999999);
 
 	protected MetersHandler metersHandler = new MetersHandler();
@@ -162,7 +163,7 @@ public class OSCHandler implements IGenericServlet {
 			portOut.send(packet);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO LOGGING
 			reqResp.setStatus(Status.INTERNAL_ERROR);
 			reqResp.setResponse("Could not send request to mixer '" + mixer + "': " + e.getMessage());
 			return;
@@ -175,8 +176,8 @@ public class OSCHandler implements IGenericServlet {
 		return listener;
 	}
 
-	protected ArrayBlockingQueue<IPMessage> buildABQueue() {
-		ArrayBlockingQueue<IPMessage> queue = new ArrayBlockingQueue<>(10, false);
+	protected ArrayBlockingQueue<IPMessage<OSCPacketEvent>> buildABQueue() {
+		ArrayBlockingQueue<IPMessage<OSCPacketEvent>> queue = new ArrayBlockingQueue<>(10, false);
 		return queue;
 	}
 
@@ -215,7 +216,7 @@ public class OSCHandler implements IGenericServlet {
 
 	protected void waitForReponse(NanoReqResp reqResp) {
 
-		IPMessage message = null;
+		IPMessage<OSCPacketEvent> message = null;
 		boolean done = false;
 		int guard = 4;
 
@@ -227,9 +228,9 @@ public class OSCHandler implements IGenericServlet {
 				if (message.rc >= 0)
 					done = true;
 				if (message.data != null) {
-					if (message.data instanceof OSCMessage) {
+					if (message.data instanceof OSCPacketEvent) {
 						ObjectMapper om = Base.getMapper();
-						reqResp.setResponse(om.writeValueAsString(message.data));
+						reqResp.setResponse(om.writeValueAsString(message.data.getPacket()));
 						reqResp.setStatus(Status.OK);
 					}
 				}

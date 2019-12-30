@@ -6,13 +6,9 @@ import org.chaseoaks.xair_proxy.data.IPMessage;
 import org.chaseoaks.xair_proxy.data.RequestAssoc;
 
 import com.illposed.osc.OSCBadDataEvent;
-import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCMessage;
-import com.illposed.osc.OSCMessageEvent;
-import com.illposed.osc.OSCPacket;
 import com.illposed.osc.OSCPacketEvent;
 import com.illposed.osc.OSCPacketListener;
-import com.illposed.osc.argument.OSCTimeTag64;
 
 public class OSCProxyPacketListener implements OSCPacketListener {
 
@@ -35,25 +31,31 @@ public class OSCProxyPacketListener implements OSCPacketListener {
 		if (exMap != null)
 			lastEvent.putAll(exMap);
 
-		OSCPacket packet = lastEvent.getPacket();
+		// OSCPacket packet = lastEvent.getPacket();
 
-		if (packet instanceof OSCBundle) {
-			handleBundle(lastEvent.getSource(), (OSCBundle) packet);
-		} else {
-			OSCTimeTag64 timeStamp = OSCTimeTag64.IMMEDIATE;
-			handleMessage(new OSCMessageEvent(lastEvent.getSource(), timeStamp, (OSCMessage) packet));
-		}
-	}
-
-	protected void handleMessage(OSCMessageEvent oscMessageEvent) {
-		IPMessage event = new IPMessage(null, oscMessageEvent.getMessage(), 0);
-		if (ra != null && ra.abQueue != null)
+		// if (packet instanceof OSCBundle) {
+		// handleBundle(lastEvent.getSource(), (OSCBundle) packet);
+		// } else {
+		// OSCTimeTag64 timeStamp = OSCTimeTag64.IMMEDIATE;
+		// handleMessage(new OSCMessageEvent(lastEvent.getSource(), timeStamp,
+		// (OSCMessage) packet));
+		// }
+		if (ra != null && ra.abQueue != null) {
+			IPMessage<OSCPacketEvent> event = new IPMessage<OSCPacketEvent>(null, originalEvent, 0);
 			ra.abQueue.offer(event);
-	}
-
-	protected void handleBundle(Object source, OSCBundle packet) {
+		}
 
 	}
+
+	// protected void handleMessage(OSCMessageEvent oscMessageEvent) {
+	// IPMessage<OSCMessageEvent> event = new IPMessage(null, oscMessageEvent, 0);
+	// if (ra != null && ra.abQueue != null)
+	// ra.abQueue.offer(event);
+	// }
+	//
+	// protected void handleBundle(Object source, OSCBundle packet) {
+	//
+	// }
 
 	@Override
 	public void handleBadData(OSCBadDataEvent event) {

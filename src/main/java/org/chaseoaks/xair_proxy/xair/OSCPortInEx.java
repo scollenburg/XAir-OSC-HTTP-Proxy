@@ -79,7 +79,12 @@ public class OSCPortInEx extends OSCPortIn implements Closeable {
 			try {
 				final OSCPacket oscPacket = oscChannel.read(buffer);
 
-				final OSCPacketEvent event = new OSCPacketEvent(this, oscPacket);
+				OSCPacketEventEx event;
+				if (oscPacket instanceof SentBy)
+					event = new OSCPacketEventEx(this, oscPacket, ((SentBy) oscPacket).getSender(), true);
+				else
+					event = new OSCPacketEventEx(this, oscPacket, null, true);
+
 				for (final OSCPacketListener listener : packetListeners) {
 					listener.handlePacket(event);
 				}
