@@ -41,7 +41,7 @@ public class OSCProxyPacketListener implements OSCPacketListener {
 		// (OSCMessage) packet));
 		// }
 		if (ra != null && ra.abQueue != null) {
-			IPMessage<OSCPacketEvent> event = new IPMessage<OSCPacketEvent>(null, originalEvent, 0);
+			IPMessage<OSCPacketEvent> event = new IPMessage<OSCPacketEvent>(null, originalEvent, ra.inIPPort);
 			ra.abQueue.offer(event);
 		}
 

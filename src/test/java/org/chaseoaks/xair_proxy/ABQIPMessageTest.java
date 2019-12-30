@@ -13,6 +13,7 @@ import org.chaseoaks.xair_proxy.data.IPMessage;
 import org.testng.annotations.Test;
 
 import com.illposed.osc.OSCMessage;
+import com.illposed.osc.OSCPacketEvent;
 
 public class ABQIPMessageTest {
 
@@ -36,16 +37,20 @@ public class ABQIPMessageTest {
 
 	public class Producer implements Runnable {
 
+		@SuppressWarnings("rawtypes")
 		ArrayBlockingQueue<IPMessage> queue;
+		@SuppressWarnings("rawtypes")
 		IPMessage infos[];
 		StatsHolder stats;
 
+		@SuppressWarnings("rawtypes")
 		public Producer(ArrayBlockingQueue<IPMessage> abq, StatsHolder stats, IPMessage[] messages) {
 			this.queue = abq;
 			this.stats = stats;
 			infos = messages;
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public void run() {
 
@@ -75,8 +80,8 @@ public class ABQIPMessageTest {
 					}
 
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					// e.printStackTrace();
+					e.printStackTrace();
+					throw new IllegalStateException("Unrecoverable Exception in Producer.run", e);
 				}
 
 				safeSleep(random.nextInt(60) + 30);
@@ -85,17 +90,20 @@ public class ABQIPMessageTest {
 	} // class Producer
 
 	public class Consumer implements Runnable {
+		@SuppressWarnings("rawtypes")
 		private ArrayBlockingQueue<IPMessage> queue;
 		StatsHolder stats;
 
+		@SuppressWarnings("rawtypes")
 		public Consumer(ArrayBlockingQueue<IPMessage> abq, StatsHolder stats) {
 			this.queue = abq;
 			this.stats = stats;
 		}
 
+		@SuppressWarnings("unchecked")
 		public void run() {
 
-			IPMessage message = null;
+			IPMessage<OSCPacketEvent> message = null;
 			boolean done = false;
 			int guard = 100;
 
@@ -104,8 +112,8 @@ public class ABQIPMessageTest {
 				try {
 					message = queue.poll(750, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
+					throw new IllegalStateException("Unrecoverable Exception in Consumer.run", e);
 				}
 				if (message == null) {
 					if (guard-- <= 0)
@@ -130,6 +138,7 @@ public class ABQIPMessageTest {
 		}
 	} // class Consumer
 
+	@SuppressWarnings("rawtypes")
 	@Test(timeOut = 5000)
 	public void ashortQueueTest() {
 
@@ -160,6 +169,7 @@ public class ABQIPMessageTest {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void longQueueTest(boolean doTrace) {
 
 		ArrayBlockingQueue<IPMessage> queue = new ArrayBlockingQueue<>(10, false);
@@ -213,7 +223,8 @@ public class ABQIPMessageTest {
 		longQueueTest(false);
 	}
 
-	private IPMessage[] shortMessageList() {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private IPMessage<OSCPacketEvent>[] shortMessageList() {
 		List<String> args = new ArrayList<String>(3);
 		args.add("foo");
 		args.add("bar");
@@ -221,18 +232,20 @@ public class ABQIPMessageTest {
 
 		IPMessage messages[] = { new IPMessage("Mares eat oats"),
 				new IPMessage("Does eat oats", ((Object) "Bucks they dotes"), 1),
-				new IPMessage("Little lambs eat ivy", new OSCMessage("/messageUno"), 100),
-				new IPMessage("A kid will eat ivy too", new OSCMessage("/messageDos", args), 12345),
+				new IPMessage("Little lambs eat ivy", new OSCPacketEvent(this, new OSCMessage("/messageUno")), 100),
+				new IPMessage("A kid will eat ivy too", new OSCPacketEvent(this, new OSCMessage("/messageDos", args)),
+						12345),
 				new IPMessage("TAIL", null, 99999) };
 
 		return messages;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private IPMessage[] longMessageList(int max) {
 
 		IPMessage messages[] = new IPMessage[max + 2];
 
-		messages[0] = new IPMessage("HEAD");
+		messages[0] = new IPMessage<OSCPacketEvent>("HEAD");
 
 		int i = 0;
 		for (i = 0; i < max; i++) {

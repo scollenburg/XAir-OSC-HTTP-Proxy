@@ -12,7 +12,6 @@ import org.chaseoaks.xair_proxy.CloseWrappers;
 import org.chaseoaks.xair_proxy.servlet.NanoReqResp;
 import org.chaseoaks.xair_proxy.xair.OSCProxyPacketListener;
 
-import com.illposed.osc.OSCMessageEvent;
 import com.illposed.osc.OSCPacket;
 import com.illposed.osc.OSCPacketEvent;
 import com.illposed.osc.transport.udp.OSCPortIn;
@@ -66,6 +65,7 @@ public class RequestAssoc implements Closeable {
 	 * 
 	 * @throws IOException
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void close() throws IOException {
 
@@ -85,7 +85,8 @@ public class RequestAssoc implements Closeable {
 				}
 
 				if (o instanceof ArrayBlockingQueue) {
-					CloseWrappers.closeABQueue((ArrayBlockingQueue<IPMessage<OSCPacketEvent>>) o);
+					// CloseWrappers.closeABQueue((ArrayBlockingQueue<IPMessage<OSCPacketEvent>>) o);
+					CloseWrappers.closeABQueue((ArrayBlockingQueue) o);
 				}
 			} catch (Exception E) {
 				// LOGGING

@@ -1,6 +1,5 @@
 package org.chaseoaks.xair_proxy;
 
-import org.chaseoaks.xair_proxy.data.MixerInfo;
 import org.chaseoaks.xair_proxy.data.MixerRegistry;
 import org.chaseoaks.xair_proxy.data.OSCPortMap;
 import org.chaseoaks.xair_proxy.xair.MetersBuffer;

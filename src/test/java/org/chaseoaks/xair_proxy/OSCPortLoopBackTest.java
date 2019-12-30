@@ -47,7 +47,12 @@ public class OSCPortLoopBackTest {
 
 	@Test
 	public void loopBack() throws IOException, OSCSerializeException, InterruptedException {
+		OSCPortMap portMap = new OSCPortMap();
+		int outIPPort = portMap.getNextPort();
+		System.out.format("Using sending port %d\n", outIPPort);
+
 		RequestAssoc ra = new RequestAssoc(null, null);
+		ra.inIPPort = outIPPort;
 		ArrayBlockingQueue<IPMessage<OSCPacketEvent>> queue = ra.set(new ArrayBlockingQueue<>(10, false));
 
 		OSCProxyPacketListener listener = new OSCProxyPacketListener(ra);
@@ -67,9 +72,6 @@ public class OSCPortLoopBackTest {
 		// IOException {
 
 		// OSCPortOut portOut = new OSCPortOut(InetAddress.getLoopbackAddress(), 10124);
-		OSCPortMap portMap = new OSCPortMap();
-		int outIPPort = portMap.getNextPort();
-		System.out.format("Using sending port %d\n", outIPPort);
 		OSCPortOut portOut = new OSCPortOut(OSCSerializerFactory.createDefaultFactory(),
 				new InetSocketAddress("127.0.0.1", 10124), new InetSocketAddress(outIPPort));
 		portOut.connect();

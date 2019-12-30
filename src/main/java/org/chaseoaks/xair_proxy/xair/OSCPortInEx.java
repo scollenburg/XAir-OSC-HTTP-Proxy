@@ -10,7 +10,6 @@ import java.util.List;
 
 import com.illposed.osc.OSCBadDataEvent;
 import com.illposed.osc.OSCPacket;
-import com.illposed.osc.OSCPacketEvent;
 import com.illposed.osc.OSCPacketListener;
 import com.illposed.osc.OSCParseException;
 import com.illposed.osc.OSCParserFactory;
