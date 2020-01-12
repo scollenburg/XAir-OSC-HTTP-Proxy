@@ -197,7 +197,7 @@ public class OSCHandler implements IGenericServlet {
 				ra.inIPPort = inIPPort;
 				break;
 			}
-			port.isConnected();
+			// port.isConnected();
 			port = null;
 		}
 

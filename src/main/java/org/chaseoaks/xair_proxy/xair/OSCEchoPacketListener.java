@@ -15,14 +15,6 @@ import com.illposed.osc.transport.udp.OSCPortOut;
 
 public class OSCEchoPacketListener implements OSCPacketListener {
 
-	// protected RequestAssoc ra;
-	// // protected OSCPacketEventEx lastEvent;
-	// protected Map<String, Object> exMap;
-
-	// public OSCEchoPacketListener(RequestAssoc rassoc) {
-	// this.ra = rassoc;
-	// }
-
 	public OSCEchoPacketListener() {
 	}
 
@@ -32,18 +24,9 @@ public class OSCEchoPacketListener implements OSCPacketListener {
 		OSCPacketEventEx event;
 
 		event = new OSCPacketEventEx(originalEvent);
-		// if (exMap != null)
-		// event.putAll(exMap);
 
 		OSCPacket packet = event.getPacket();
 
-		// if (packet instanceof OSCBundle) {
-		// handleBundle(lastEvent.getSource(), (OSCBundle) packet);
-		// } else {
-		// OSCTimeTag64 timeStamp = OSCTimeTag64.IMMEDIATE;
-		// handleMessage(new OSCMessageEvent(lastEvent.getSource(), timeStamp,
-		// (OSCMessage) packet));
-		// }
 		if (packet instanceof OSCMessage) {
 			System.out.printf("  EchoListener got messaage: %s\n", ((OSCMessage) packet).getAddress());
 		}
@@ -80,29 +63,5 @@ public class OSCEchoPacketListener implements OSCPacketListener {
 	public void handleBadData(OSCBadDataEvent event) {
 		// TODO LOGGING Auto-generated method stub
 	}
-
-	// public Map<String, Object> setMap(Map<String, Object> map) {
-	// this.exMap = map;
-	// return map;
-	// }
-	//
-	// public Map<String, Object> getMap() {
-	// return exMap;
-	// }
-
-	// public void clearLast() {
-	// lastEvent = null;
-	// }
-	//
-	// public OSCMessage getLastMessage() {
-	// if (lastEvent == null)
-	// return null;
-	//
-	// return (OSCMessage) lastEvent.getPacket();
-	// }
-	//
-	// public OSCPacketEvent getLastEvent() {
-	// return lastEvent;
-	// }
 
 }

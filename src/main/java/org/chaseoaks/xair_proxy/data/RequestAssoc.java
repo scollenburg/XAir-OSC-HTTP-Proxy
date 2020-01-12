@@ -14,6 +14,7 @@ import org.chaseoaks.xair_proxy.xair.OSCProxyPacketListener;
 
 import com.illposed.osc.OSCPacket;
 import com.illposed.osc.OSCPacketEvent;
+import com.illposed.osc.transport.udp.OSCPort;
 import com.illposed.osc.transport.udp.OSCPortIn;
 import com.illposed.osc.transport.udp.OSCPortOut;
 
@@ -43,10 +44,9 @@ public class RequestAssoc implements Closeable {
 	protected void addUnclosed(Object o) {
 		if (o == null)
 			return;
-		if (o instanceof Closeable) {
-			unclosed.add(o);
-			return;
-		}
+		// if (o instanceof Closeable) {
+		unclosed.add(o);
+		return;
 	}
 
 	protected String buildExtAlias() {
@@ -84,8 +84,15 @@ public class RequestAssoc implements Closeable {
 					continue;
 				}
 
+				if (o instanceof OSCPort) {
+					((OSCPort) o).disconnect();
+					((OSCPort) o).close();
+					continue;
+				}
+
 				if (o instanceof ArrayBlockingQueue) {
-					// CloseWrappers.closeABQueue((ArrayBlockingQueue<IPMessage<OSCPacketEvent>>) o);
+					// CloseWrappers.closeABQueue((ArrayBlockingQueue<IPMessage<OSCPacketEvent>>)
+					// o);
 					CloseWrappers.closeABQueue((ArrayBlockingQueue) o);
 				}
 			} catch (Exception E) {
@@ -101,21 +108,25 @@ public class RequestAssoc implements Closeable {
 
 	public ArrayBlockingQueue<IPMessage<OSCPacketEvent>> set(ArrayBlockingQueue<IPMessage<OSCPacketEvent>> abq) {
 		this.abQueue = abq;
+		addUnclosed(abq);
 		return abq;
 	}
 
 	public OSCPortIn set(OSCPortIn port) {
 		this.portIn = port;
+		addUnclosed(port);
 		return port;
 	}
 
 	public OSCProxyPacketListener set(OSCProxyPacketListener l) {
 		this.listener = l;
+		addUnclosed(l);
 		return l;
 	}
 
 	public OSCPortOut set(OSCPortOut port) {
 		this.portOut = port;
+		addUnclosed(port);
 		return port;
 	}
 

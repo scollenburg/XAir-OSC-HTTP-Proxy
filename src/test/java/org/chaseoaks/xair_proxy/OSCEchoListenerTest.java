@@ -15,8 +15,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.chaseoaks.xair_proxy.data.IPMessage;
+import org.chaseoaks.xair_proxy.data.MixerRegistry;
 import org.chaseoaks.xair_proxy.data.OSCPortMap;
 import org.chaseoaks.xair_proxy.data.RequestAssoc;
+import org.chaseoaks.xair_proxy.servlet.OSCProxyServer;
 import org.chaseoaks.xair_proxy.xair.OSCEchoPacketListener;
 import org.chaseoaks.xair_proxy.xair.OSCPortInEx;
 import org.chaseoaks.xair_proxy.xair.OSCProxyPacketListener;
@@ -46,13 +48,13 @@ public class OSCEchoListenerTest {
 
 	}
 
-	@Test
+	@Test(timeOut = 60000)
 	public void directOSCPort() throws IOException, OSCSerializeException, InterruptedException {
 
 		/**
 		 * Make this longer when debugging
 		 */
-		int waitLen = 120000;
+		int waitLen = 10000;
 
 		RequestAssoc ra = new RequestAssoc(null, null);
 		ArrayBlockingQueue<IPMessage<OSCPacketEvent>> queue = ra.set(new ArrayBlockingQueue<>(10, false));
@@ -160,6 +162,129 @@ public class OSCEchoListenerTest {
 
 		portInEcho.stopListening();
 		portInEcho.close();
+	}
+
+	@Test(timeOut = 100000)
+	public void registeredOSCPort() throws IOException, OSCSerializeException, InterruptedException {
+
+		/**
+		 * Make this longer when debugging
+		 */
+		int waitLen = 10000;
+
+		OSCPortMap portMap = FactoryMaster.getMaster().getPortMap();
+
+		int echoIPPort = MixerRegistry.startEchoListener();
+		assertTrue(echoIPPort > 0, "Bad 'echo' port: " + String.valueOf(echoIPPort));
+		System.out.format("Using 'echo' port %d\n", echoIPPort);
+
+		RequestAssoc echora = portMap.registerPort(null).get(Integer.valueOf(echoIPPort));
+		assertTrue(echora.portIn.isListening(), "'echo' PortIn NOT listening");
+
+		RequestAssoc ra = new RequestAssoc(null, null);
+		ArrayBlockingQueue<IPMessage<OSCPacketEvent>> queue = ra.set(new ArrayBlockingQueue<>(10, false));
+
+		int outIPPort = portMap.getNextPort();
+		System.out.format("Using sending port %d\n", outIPPort);
+
+		OSCProxyPacketListener listener = new OSCProxyPacketListener(ra);
+		OSCPortIn portIn = new OSCPortInEx(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), outIPPort));
+		ra.inIPPort = outIPPort;
+		ra.set(portIn);
+		portMap.registerPort(ra);
+		portIn.setDaemonListener(false);
+		portIn.addPacketListener(listener);
+		portIn.startListening();
+
+		// OSCPortOut portOut = new OSCPortOut(InetAddress.getLoopbackAddress(), 10124);
+		OSCPortOut portOut = new OSCPortOut(OSCSerializerFactory.createDefaultFactory(),
+				new InetSocketAddress("127.0.0.1", echoIPPort), new InetSocketAddress(outIPPort));
+		ra.set(portOut);
+		portOut.connect();
+		assertTrue(portOut.isConnected(), "portOut NOT connected");
+
+		OSCMessage message = new OSCMessage("/xinfo");
+		portOut.send(message);
+		safeSleep(10);
+		IPMessage<OSCPacketEvent> ipmessage;
+		OSCMessage lastMessage = null; // = listener.getLastMessage();
+		ipmessage = queue.poll(waitLen, TimeUnit.MILLISECONDS);
+		assertNotNull(ipmessage, "ipmessage is NULL (xinfo)");
+
+		if (ipmessage.data instanceof OSCPacketEvent)
+			lastMessage = (OSCMessage) ipmessage.data.getPacket();
+
+		assertNotNull(lastMessage, "lastMessage is NULL (xinfo)");
+		String address = lastMessage.getAddress();
+		assertEquals(address, "/xinfo");
+
+		assertTrue(lastMessage instanceof SentBy, lastMessage.toString() + " does not support SentBy");
+		if (lastMessage instanceof SentBy) {
+			assertNotEquals(((SentBy) lastMessage).getSender().getPort(), outIPPort, "Unexpected sender port");
+		}
+
+		List<Object> origArguments = new ArrayList<>(3);
+		origArguments.add(0.75f);
+
+		listener.clearLast();
+
+		lastMessage = listener.getLastMessage();
+		assertNull(lastMessage, "lastMessage not cleared");
+
+		message = new OSCMessage("/ch/02/mix/fader", origArguments);
+		portOut.send(message);
+		safeSleep(10);
+		ipmessage = queue.poll(waitLen, TimeUnit.MILLISECONDS);
+		if (ipmessage.data instanceof OSCPacketEvent)
+			lastMessage = (OSCMessage) ipmessage.data.getPacket();
+
+		assertNotNull(lastMessage, "lastMessage is NULL (fader)");
+
+		address = lastMessage.getAddress();
+		assertEquals(address, "/ch/02/mix/fader");
+
+		List<Object> recvArguments = lastMessage.getArguments();
+		assertNotNull(recvArguments, "lastMessage is NULL (fader)");
+		assertEquals(recvArguments.size(), 1);
+		Class<? extends Object> argClass = recvArguments.get(0).getClass();
+		assertEquals(argClass.getName(), "java.lang.Float");
+		assertEquals((float) recvArguments.get(0), 0.75f, 0.0001f);
+
+		OSCBundle bundle = new OSCBundle();
+		bundle.addPacket(new OSCMessage("/foo"));
+		bundle.addPacket(new OSCMessage("/bar"));
+		bundle.addPacket(new OSCMessage("/baz"));
+		bundle.addPacket(new OSCMessage("/biffbiffybiff"));
+
+		portOut.send(bundle);
+		safeSleep(10);
+		ipmessage = queue.poll(waitLen, TimeUnit.MILLISECONDS);
+		OSCBundle lastBundle = null;
+		assertNotNull(ipmessage, "ipmessage is NULL ([foo,bar,baz,biffbiffbiff])");
+		assertNotNull(ipmessage.data, "ipmessage.data is NULL ([foo,bar,baz,biffbiffybiff])");
+		if (ipmessage.data instanceof OSCPacketEvent)
+			lastBundle = (OSCBundle) ipmessage.data.getPacket();
+		assertNotNull(lastBundle, "lastBundle is NULL ([foo,bar,baz,biffbiffybiff])");
+
+		assertNotNull(lastBundle.getPackets(), "getPackets() is NULL");
+		assertEquals(lastBundle.getPackets().size(), 4, "getPackets() bad List size");
+
+		// ra.close();
+		// portIn.stopListening();
+		// portIn.close();
+		// portOut.close();
+		//
+		// portInEcho.stopListening();
+		// portInEcho.close();
+
+		assertTrue(echora.portIn.isListening(), "echora.portIn (return) NOT listening");
+		assertTrue(portIn.isListening(), "portIn (return) NOT listening");
+		assertTrue(portOut.isConnected(), "portOut NOT connected");
+		OSCProxyServer.closeAllOSCInPorts(portMap.registerPort(null));
+		safeSleep(10);
+		assertTrue(!echora.portIn.isListening(), "portIn (return) IS listening");
+		assertTrue(!portIn.isListening(), "portIn (return) IS listening");
+		assertTrue(!portOut.isConnected(), "portOut IS connected");
 	}
 
 	private void safeSleep(int i) {

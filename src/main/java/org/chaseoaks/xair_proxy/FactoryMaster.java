@@ -49,7 +49,7 @@ public class FactoryMaster {
 	public MixerRegistry getMixerRegistry() {
 		if (FactoryMaster.mixers == null) {
 			FactoryMaster.mixers = new MixerRegistry();
-			FactoryMaster.mixers.add(MixerRegistry.buildLoopback());
+			FactoryMaster.mixers.add(MixerRegistry.buildEchoRegistry());
 		}
 
 		return FactoryMaster.mixers;
